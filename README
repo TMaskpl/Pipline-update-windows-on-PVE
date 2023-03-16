@@ -10,7 +10,7 @@
 
 ## Stage('Create snapshot...') IF true
 
-- Tworzy spapshot przed aktualizacją
+- Tworzy snapshot przed aktualizacją
         
 ## Stage('Update Windows ...') IF true
 
