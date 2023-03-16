@@ -1,14 +1,23 @@
 
-        stage('Git clone...')
+## Stage('Git clone...')
+
+- Pobiera całe repozytorium
 
 
-        stage('Check system...')
+## Stage('Check system...')
 
+- Sprawdzenie proxmox host, czy jest wystarczająco dużo miejsca  na dysku pod snapshot. Powyzej 95% przerywa
 
-        stage('Create snapshot...') IF true
+## Stage('Create snapshot...') IF true
 
+- Tworzy spapshot przed aktualizacją
         
-        stage('Update Windows ...') IF true
+## Stage('Update Windows ...') IF true
 
+- Aktualizacja Windows:
+        - SecurityUpdates
+        - CriticalUpdates
 
-        stage('Remove snapshot...') IF true
+## Stage('Remove snapshot...') IF true
+
+- Usuwa ostatni snapshot
