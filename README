@@ -1,0 +1,14 @@
+
+        stage('Git clone...')
+
+
+        stage('Check system...')
+
+
+        stage('Create snapshot...') IF true
+
+        
+        stage('Update Windows ...') IF true
+
+
+        stage('Remove snapshot...') IF true
