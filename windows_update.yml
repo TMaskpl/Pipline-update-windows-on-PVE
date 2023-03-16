@@ -1,0 +1,15 @@
+---
+  - hosts: "{{ win_vm }}"
+    vars:
+        ansible_host_key_checking: false
+
+    tasks:
+    - name: Install all security, critical without a scheduled task
+      ansible.windows.win_updates:
+        category_names:
+          - SecurityUpdates
+          - CriticalUpdates
+        reboot: yes
+        reboot_timeout: 3600
+      tags: ["updates"]
+

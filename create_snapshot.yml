@@ -1,0 +1,36 @@
+---
+- hosts: "{{ host_vm }}"
+  gather_facts: true
+  become: yes
+  become_method: sudo
+  vars:
+    ansible_host_key_checking: false
+    favcolor: blue
+
+  tasks:
+  - name: "Check snapshot {{ host_vm }} - {{ vm_id }}"
+    shell: |    
+        echo "SNAP_{{ ansible_date_time.iso8601_basic_short }}"
+        echo " "
+        echo "VM list..."
+        qm list
+        echo " "
+        echo "Show shap list..."
+        qm listsnapshot "{{ vm_id }}"
+        echo " "
+        echo "Create SNAP_{{ ansible_date_time.iso8601_basic_short }}"
+        qm snapshot "{{ vm_id }}" "SNAP_{{ ansible_date_time.iso8601_basic_short }}"
+        echo " "
+        echo "Show shap list..."
+        qm listsnapshot "{{ vm_id }}"
+        echo " "
+        qm listsnapshot "{{ vm_id }}" | grep "SNAP_{{ ansible_date_time.iso8601_basic_short }}"
+        test $? -eq 0 || exit 1
+    register: shell_result
+    args:
+      executable: /bin/bash
+    tags: ["snap"]
+
+  - debug:
+      var: shell_result.stdout_lines
+    tags: ["snap"]

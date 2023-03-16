@@ -1,0 +1,62 @@
+---
+- hosts: "{{ host_vm }}"
+  gather_facts: true
+  become: yes
+  become_method: sudo
+  vars:
+    ansible_host_key_checking: false
+    favcolor: blue
+
+  tasks:
+  - name: "Check status Server"
+    shell: |    
+        echo "TMaskPL_{{ ansible_date_time.iso8601_basic_short }}"
+        echo " "  
+        echo "Address IP... "  
+        hostname -I
+        echo " "
+        echo "Hostname... "  
+        hostname
+        echo " "
+        echo "Kernel... "  
+        uname -a
+        echo " "
+        echo "Ubuntu release..."  
+        cat /etc/lsb-release
+        echo " "
+        echo "Disc space... "  
+        df -h | grep -v -E "tmpfs|udev|fuse" | grep "/"
+        echo " "
+        DISC=$(qm config 108 | grep vm- | awk -F ':' '{print $2}' | sed 's/^[[:space:]]*//g')        
+        DF=$(df -h | grep -v -E "tmpfs|udev|fuse" | grep $DISC | awk -F ' ' '{print $5}')
+        for disk in $DF
+        do
+        PROC=$(echo ${disk::-1})
+        echo "$DISC - $PROC %"
+        if [ $PROC -gt 95 ];
+        then
+        echo "ERROR - disk space"
+        df -h | grep -v -E "tmpfs|udev|fuse" | grep "/" | awk -F ' ' '{print $1,$5}'
+        exit 1
+        fi
+        done
+        echo " "
+        echo "Memory usage... "  
+        free -h
+        echo " "
+        echo "Cpu Top 5 "  
+        ps -aux --sort=-pcpu | head -n 6
+        echo " "
+        echo "Update packages..."
+        apt-get -q -y --ignore-hold --allow-change-held-packages --allow-unauthenticated -s dist-upgrade | /bin/grep  ^Inst | wc -l
+        echo " "
+        echo "VM list "
+        qm list
+    register: shell_result
+    args:
+      executable: /bin/bash
+    tags: ["check"]
+
+  - debug:
+      var: shell_result.stdout_lines
+    tags: ["check"]

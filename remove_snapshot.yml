@@ -1,0 +1,34 @@
+---
+- hosts: "{{ host_vm }}"
+  gather_facts: false
+  become: yes
+  become_method: sudo
+  vars:
+    ansible_host_key_checking: false
+    favcolor: blue
+
+  tasks:
+  - name: "Remove snapshot {{ host_vm }} - {{ vm_id }}"
+    shell: |
+        echo " "
+        echo "Show snap list..."
+        qm listsnapshot "{{ vm_id }}"
+        SNAP=$(qm listsnapshot "{{ vm_id }}" | grep SNAP | awk -F ' ' '{print $2}' | tail -n 1)
+        echo " "
+        echo "Remove last snap - $SNAP"
+        qm delsnapshot "{{ vm_id }}" $SNAP
+        echo " "
+        echo "Show snap list..."
+        qm listsnapshot "{{ vm_id }}"
+        echo " "
+        qm listsnapshot "{{ vm_id }}" | grep  $SNAP
+        test $? -eq 1 || exit 1
+    register: shell_result
+    args:
+      executable: /bin/bash
+    tags: ["remove"]
+
+  - debug:
+      var: shell_result.stdout_lines
+    tags: ["remove"]
+
