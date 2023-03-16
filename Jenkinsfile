@@ -3,9 +3,9 @@ def FAILED_STAGE
 pipeline {
     agent any
     parameters {
-        string defaultValue: 'tmask-pro', description: 'Podaj nazwe hosta PVE', name: 'host_vm'
-        string defaultValue: '108', description: 'Podaj id vm', name: 'vm_id'
-        string defaultValue: 'win1', description: 'Podaj nazwe hosta Windows', name: 'win_vm'
+        string defaultValue: 'pve-host', description: 'Podaj nazwe hosta PVE', name: 'host_vm'
+        string defaultValue: '666', description: 'Podaj id vm', name: 'vm_id'
+        string defaultValue: 'win-host', description: 'Podaj nazwe hosta Windows', name: 'win_vm'
         booleanParam defaultValue: true, description: 'Aktualizacja Windows', name: 'run_update'
         booleanParam defaultValue: true, description: 'Tworzenie snapshot', name: 'create_snap'
         booleanParam defaultValue: false, description: 'Czy skasować snap po aktualizacji', name: 'remove_snap'
@@ -19,7 +19,7 @@ pipeline {
                 script {
                     FAILED_STAGE=env.STAGE_NAME
                     echo 'Clone repository...'
-                    git branch: 'main', credentialsId: 'pro_gitlab_secret', url: 'https://gitlab.com/dniemczok/pipeline_create_snapshot_pve_windows_update.git'
+                    git branch: 'main', url: 'https://github.com/TMaskpl/Pipline-update-windows-on-PVE.git'
                 }
             }
         }
@@ -59,7 +59,7 @@ pipeline {
                 script {
                     FAILED_STAGE=env.STAGE_NAME
                     echo 'Update Windows...'
-                    // ansiblePlaybook installation: 'Ansible', extras: '-e win_vm=${win_vm}', playbook: 'windows_update.yml', tags: 'updates'
+                    ansiblePlaybook installation: 'Ansible', extras: '-e win_vm=${win_vm}', playbook: 'windows_update.yml', tags: 'updates'
                 }
             }
         }
