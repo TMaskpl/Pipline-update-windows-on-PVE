@@ -1,5 +1,7 @@
 #Requires -Version 3.0
 
+# Set-ItemProperty -Path registry::HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL -Name ClientAuthTrustMode -Type DWord -Value 2
+
 # Configure a Windows host for remote management with Ansible
 # -----------------------------------------------------------
 #
