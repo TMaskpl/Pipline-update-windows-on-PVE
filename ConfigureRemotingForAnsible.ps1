@@ -2,6 +2,8 @@
 
 # Uruchom w W2K19 powershell Admin i restart serwera
 # Set-ItemProperty -Path registry::HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL -Name ClientAuthTrustMode -Type DWord -Value 2
+# wget -Uri https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile winrm.ps1 .\winrm.ps1
+
 
 # Configure a Windows host for remote management with Ansible
 # -----------------------------------------------------------
