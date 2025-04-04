@@ -26,7 +26,9 @@ $getUpdateParam = @{
 [ciminstance[]]$updates = Get-CimInstance @getUpdateParam
 
 if ($updates) {
-    Write-EventLog -LogName $logName -Source $logSource -EntryType Information -EventId 2 -Message "Found updates to install"
+    # Log the updates to be installed
+    $updateNames = $updates | ForEach-Object { $_.ArticleID }
+    Write-EventLog -LogName $logName -Source $logSource -EntryType Information -EventId 2 -Message "Found updates to install: $($updateNames -join ', ')"
     
     Invoke-CimMethod @installUpdateParam  -Arguments @{ CCMUpdates = $updates } 
     Write-EventLog -LogName $logName -Source $logSource -EntryType Information -EventId 3 -Message "Updates installation initiated"
