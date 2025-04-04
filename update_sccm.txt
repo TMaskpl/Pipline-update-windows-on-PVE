@@ -1,0 +1,45 @@
+# Define the log source and log name
+$logSource = "SCCM Update Script"
+$logName = "Application"
+
+# Create the event source if it does not exist
+if (-not (Get-EventLog -LogName $logName | Where-Object { $_.Source -eq $logSource })) {
+    New-EventLog -LogName $logName -Source $logSource
+}
+
+# Log starting message
+Write-EventLog -LogName $logName -Source $logSource -EntryType Information -EventId 1 -Message "Starting SCCM update script"
+
+Start-Process -FilePath "C:\Windows\CCM\ClientUX\scclient.exe" "softwarecenter:Page=InstallationStatus"
+$installUpdateParam = @{
+        NameSpace = 'root/ccm/ClientSDK'
+        ClassName = 'CCM_SoftwareUpdatesManager'
+        MethodName = 'InstallUpdates'
+    }
+
+$getUpdateParam = @{            
+        NameSpace = 'root/ccm/ClientSDK'
+        ClassName = 'CCM_SoftwareUpdate'
+        Filter = 'EvaluationState < 8'
+    }       
+
+[ciminstance[]]$updates = Get-CimInstance @getUpdateParam
+
+if ($updates) {
+    Write-EventLog -LogName $logName -Source $logSource -EntryType Information -EventId 2 -Message "Found updates to install"
+    
+    Invoke-CimMethod @installUpdateParam  -Arguments @{ CCMUpdates = $updates } 
+    Write-EventLog -LogName $logName -Source $logSource -EntryType Information -EventId 3 -Message "Updates installation initiated"
+
+    while(Get-CimInstance @getUpdateParam){
+        Write-EventLog -LogName $logName -Source $logSource -EntryType Information -EventId 4 -Message "Waiting for updates to install"
+        Start-Sleep -Seconds 30
+    }
+
+    Write-EventLog -LogName $logName -Source $logSource -EntryType Information -EventId 5 -Message "Updates installation completed"
+} else {
+    Write-EventLog -LogName $logName -Source $logSource -EntryType Information -EventId 6 -Message "No updates found to install"
+}
+
+# Log ending message
+Write-EventLog -LogName $logName -Source $logSource -EntryType Information -EventId 7 -Message "SCCM update script completed"
